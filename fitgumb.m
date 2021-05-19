@@ -20,6 +20,9 @@ function [phat] = fitgumb(data,varargin)
 %
 % See also  pdfgumb, cdfgumb, invgumb, rndgumb, momgumb plotgumb
 
+% Reference: 
+%  Johnson  N.L., Kotz S. and Balakrishnan, N. (1994)
+%  Continuous Univariate Distributions, Volume 2. Wiley. 
 
 
 % tested on: matlab 5.3
@@ -36,7 +39,8 @@ global WAFO_WSTATS_DEFAULT_PLOTFLAG
 %error(nargchk(1,inf,nargin))
 narginchk(1,inf)
 % Add these options?: 'shape',nan,'scale',nan,'location',0, 
-options = struct('method','ML','alpha',0.05,'plotflag', WAFO_WSTATS_DEFAULT_PLOTFLAG,'trunc',false, 'start',[],'optimset',optimset('disp','off','TolX',1e-5,'TolFun',1e-5,'MaxIter',500)); % default options
+options = struct('method','ML','alpha',0.05,'plotflag', WAFO_WSTATS_DEFAULT_PLOTFLAG,'trunc',false, 'start',[],... 
+  'optimset',optimset('disp','off','TolX',1e-5,'TolFun',1e-5,'MaxIter',500)); % default options
 if (nargin==1 && nargout <= 1 && isequal(data,'defaults'))
   phat = options; 
   return
@@ -71,7 +75,9 @@ if strcmpi(options.method,'ml') || strcmpi(options.method,'mps')  % Maximum Like
      ciU = phat0+sqrt(pvar).*zcrit;
      
      [LPS,pvalue] = logps(phat0,data,'cdfgumb');
-     phat = createfdata(options,'dist','pdfgumb','params',phat0,'lower',ciL,'upper',ciU,'covar',pcov,'var',diag(pcov).','dataname',inputname(1),'data',data,'loglikemax', -loglike(phat0,data,'pdfgumb'),'logpsmax',-LPS,'pvalue',pvalue,'pdfoptions',struct('trunc',options.trunc), 'note',sprintf('Moran''s statistic on fit: pvalue = %g',pvalue));
+     phat = createfdata(options,'dist','pdfgumb','params',phat0,'lower',ciL,'upper',ciU,'covar',pcov,'var',diag(pcov).',...
+    'dataname',inputname(1),'data',data,'loglikemax', -loglike(phat0,data,'pdfgumb'),'logpsmax',-LPS,'pvalue',pvalue,...
+    'pdfoptions',struct('trunc',options.trunc), 'note',sprintf('Moran''s statistic on fit: pvalue = %g',pvalue));
 
     phat = fdata(phat);
 
